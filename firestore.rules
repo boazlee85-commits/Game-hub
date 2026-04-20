@@ -1,0 +1,61 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    
+    function isGamePlayer(gameId) {
+      let game = get(/databases/$(database)/documents/games/$(gameId)).data;
+      return request.auth.uid == game.redPlayer || request.auth.uid == game.bluePlayer;
+    }
+    
+    function getGame(gameId) {
+      return get(/databases/$(database)/documents/games/$(gameId)).data;
+    }
+    
+    function getPlayerColor(gameId) {
+      let game = getGame(gameId);
+      return game.redPlayer == request.auth.uid ? 'red' : 'blue';
+    }
+    
+    // Games collection
+    match /games/{gameId} {
+      // Allow creating new games (everyone can create)
+      allow create: if isSignedIn();
+      
+      // Allow reading if player is in the game or it's available
+      allow read: if isSignedIn() && (
+        isGamePlayer(gameId) || 
+        getGame(gameId).status == 'waiting'
+      );
+      
+      // Allow updating if player is in the game
+      allow update: if isSignedIn() && isGamePlayer(gameId) && 
+        // Can't change created fields
+        (
+          !resource.data.keys().hasAny(['createdBy', 'redPlayer', 'bluePlayer']) ||
+          resource.data.createdBy == request.auth.uid
+        );
+      
+      // Allow deleting only if creator and no moves made
+      allow delete: if isSignedIn() && 
+        resource.data.createdBy == request.auth.uid &&
+        resource.data.moveCount == 0;
+      
+      // Moves subcollection - only for players in the game
+      match /moves/{moveId} {
+        allow create: if isSignedIn() && isGamePlayer(gameId);
+        allow read: if isSignedIn() && isGamePlayer(gameId);
+        allow list: if isSignedIn() && isGamePlayer(gameId);
+      }
+    }
+    
+    // Default deny all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

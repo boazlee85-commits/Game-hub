@@ -1,0 +1,54 @@
+{
+  "name": "GameSession",
+  "type": "object",
+  "properties": {
+    "status": {
+      "type": "string",
+      "enum": [
+        "waiting",
+        "setup",
+        "playing",
+        "finished"
+      ],
+      "default": "waiting"
+    },
+    "red_player_email": {
+      "type": "string"
+    },
+    "blue_player_email": {
+      "type": "string"
+    },
+    "red_player_name": {
+      "type": "string"
+    },
+    "blue_player_name": {
+      "type": "string"
+    },
+    "board": {
+      "type": "string"
+    },
+    "current_player": {
+      "type": "string",
+      "default": "red"
+    },
+    "winner": {
+      "type": "string"
+    },
+    "red_setup_done": {
+      "type": "boolean",
+      "default": false
+    },
+    "blue_setup_done": {
+      "type": "boolean",
+      "default": false
+    },
+    "last_move": {
+      "type": "string"
+    },
+    "move_count": {
+      "type": "number",
+      "default": 0
+    }
+  },
+  "required": []
+}
