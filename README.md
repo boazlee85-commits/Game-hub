@@ -1,65 +1,49 @@
 # Game Hub
 
-A React-based game sharing platform built with Vite, Firebase, and React Router.
+A local game sharing and idea collection website built with React and Vite.
 
-## Features
+**About**
 
-- **Game Library**: Browse and play games in a grid layout
-- **Game Ideas**: Share and like game ideas (requires authentication)
-- **Admin Upload**: Upload new games (admin only)
-- **Authentication**: Sign in/sign up with email and password
-- **Real-time Updates**: Live updates using Firebase Firestore
+This is a standalone web application for sharing and discovering games. Users can upload games, browse the collection, and share ideas for new games.
 
-## Setup
+**Features**
 
-1. **Clone the repository**
-   ```bash
-   git clone <your-repo-url>
-   cd game-hub
-   ```
+- Browse and search uploaded games
+- Upload new games (password protected)
+- Share and vote on game ideas
+- Local storage (no backend required)
+- Responsive design with dark/light themes
 
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
+**Getting Started**
 
-3. **Firebase Setup**
-   - Create a Firebase project at [Firebase Console](https://console.firebase.google.com/)
-   - Enable Authentication with Email/Password
-   - Enable Firestore Database
-   - Copy your Firebase config
+1. Clone the repository
+2. Navigate to the project directory
+3. Install dependencies: `npm install`
+4. Run the development server: `npm run dev`
 
-4. **Environment Variables**
-   - Copy `.env.example` to `.env`
-   - Fill in your Firebase credentials:
-   ```env
-   VITE_FIREBASE_API_KEY=your_api_key
-   VITE_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
-   VITE_FIREBASE_PROJECT_ID=your_project_id
-   VITE_FIREBASE_STORAGE_BUCKET=your_project.appspot.com
-   VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
-   VITE_FIREBASE_APP_ID=your_app_id
-   ```
+**Usage**
 
-5. **Run the development server**
-   ```bash
-   npm run dev
-   ```
+- **Home**: Browse and search games
+- **Upload Games**: Add new games (requires password)
+- **Ideas**: Share and vote on game ideas
+- **Settings**: Change upload password
 
-## Admin Access
+**Default Upload Password**
 
-To upload games, sign in with the admin account configured in the code.
+The default password for uploading games is `0424`. You can change it in Settings.
 
-## Build for Production
+**Build for Production**
 
 ```bash
 npm run build
+npm run preview
 ```
 
-## Tech Stack
+**Tech Stack**
 
-- React 19
+- React 18
 - Vite
-- Firebase (Auth + Firestore)
-- React Router
-- ESLint
+- Tailwind CSS
+- Radix UI
+- React Query
+- Framer Motion
