@@ -4,13 +4,13 @@ import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCf04VW_p4WaOKpYcdLlFDOP23D2JlscOM",
-  authDomain: "stratego-f3299.firebaseapp.com",
-  projectId: "stratego-f3299",
-  storageBucket: "stratego-f3299.firebasestorage.app",
-  messagingSenderId: "203519895933",
-  appId: "1:203519895933:web:a6a7a7e9bf41b28cdd4414",
-  measurementId: "G-E2XHJNG9GP"
+  apiKey: "AIzaSyCTNNHLKN61uoSHAUkC3yPf8Tv1mCsPjLY",
+  authDomain: "stratego-4539e.firebaseapp.com",
+  projectId: "stratego-4539e",
+  storageBucket: "stratego-4539e.firebasestorage.app",
+  messagingSenderId: "1042198097098",
+  appId: "1:1042198097098:web:d1ebff1d72d39755141833",
+  measurementId: "G-H6S969N7R4"
 };
 
 export const isFirebaseConfigured = Object.values(firebaseConfig).every(
