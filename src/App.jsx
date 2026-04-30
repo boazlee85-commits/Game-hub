@@ -1,10 +1,7 @@
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
 import PageNotFound from './lib/PageNotFound';
-
-import ProtectedRoute from './components/ProtectedRoute';
 import AppLayout from './components/layout/AppLayout';
-import Auth from './pages/Auth';
 import Home from './pages/Home';
 import Play from './pages/Play';
 import Rules from './pages/Rules';
@@ -17,20 +14,14 @@ function App() {
   return (
     <Router>
       <Routes>
-        {/* Auth Route - No layout */}
-        <Route path="/auth" element={<Auth />} />
-
-        {/* Protected Routes - With layout */}
         <Route element={<AppLayout />}>
-          <Route element={<ProtectedRoute />}>
-            <Route path="/" element={<Home />} />
-            <Route path="/play" element={<Play />} />
-            <Route path="/rules" element={<Rules />} />
-            <Route path="/settings" element={<Settings />} />
-            <Route path="/pieces" element={<Pieces />} />
-            <Route path="/lobby" element={<Lobby />} />
-            <Route path="/game/:id" element={<OnlineGame />} />
-          </Route>
+          <Route path="/" element={<Home />} />
+          <Route path="/play" element={<Play />} />
+          <Route path="/rules" element={<Rules />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/pieces" element={<Pieces />} />
+          <Route path="/lobby" element={<Lobby />} />
+          <Route path="/game/:id" element={<OnlineGame />} />
         </Route>
 
         <Route path="*" element={<PageNotFound />} />

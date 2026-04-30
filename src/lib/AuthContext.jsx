@@ -1,94 +1,52 @@
-import React, { createContext, useState, useContext, useEffect, useRef } from 'react';
-import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  signOut,
-  onAuthStateChanged,
-  updateProfile,
-} from 'firebase/auth';
-import { auth } from './firebase';
+import React, { createContext, useState, useContext } from 'react';
 
 const AuthContext = createContext();
 
+const STORAGE_KEY = 'stratego-guest-user';
+
+function createGuestUser() {
+  const randomId = Math.random().toString(36).slice(2, 10);
+  return {
+    id: `guest-${randomId}`,
+    name: `Guest ${randomId.toUpperCase()}`,
+    email: `guest+${randomId}@stratego.local`,
+  };
+}
+
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isLoadingAuth, setIsLoadingAuth] = useState(true);
-  const [isAuthPending, setIsAuthPending] = useState(false);
-  const [authError, setAuthError] = useState(null);
-  const authPendingRef = useRef(false);
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      if (firebaseUser) {
-        setUser({
-          id: firebaseUser.uid,
-          email: firebaseUser.email,
-          name: firebaseUser.displayName || firebaseUser.email,
-          photoURL: firebaseUser.photoURL,
-        });
-        setIsAuthenticated(true);
-      } else {
-        setUser(null);
-        setIsAuthenticated(false);
-      }
-      setIsLoadingAuth(false);
-      if (authPendingRef.current) {
-        authPendingRef.current = false;
-        setIsAuthPending(false);
-      }
-    });
-
-    return unsubscribe;
-  }, []);
-
-  const register = async (email, password, displayName) => {
-    authPendingRef.current = true;
-    setIsAuthPending(true);
+  const [user, setUser] = useState(() => {
     try {
-      setAuthError(null);
-      const result = await createUserWithEmailAndPassword(auth, email, password);
-      
-      if (displayName) {
-        await updateProfile(result.user, { displayName });
+      const saved = window.localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        return JSON.parse(saved);
       }
-      
-      return result.user;
     } catch (error) {
-      authPendingRef.current = false;
-      setIsAuthPending(false);
-      setAuthError(error.message);
-      throw error;
+      console.error('Failed to read guest user from storage', error);
     }
+    const guestUser = createGuestUser();
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(guestUser));
+    return guestUser;
+  });
+
+  const [isAuthenticated] = useState(true);
+  const [isLoadingAuth] = useState(false);
+  const [isAuthPending] = useState(false);
+  const [authError] = useState(null);
+
+  const login = async () => {
+    return user;
   };
 
-  const login = async (email, password) => {
-    authPendingRef.current = true;
-    setIsAuthPending(true);
-    try {
-      setAuthError(null);
-      const result = await signInWithEmailAndPassword(auth, email, password);
-      return result.user;
-    } catch (error) {
-      authPendingRef.current = false;
-      setIsAuthPending(false);
-      setAuthError(error.message);
-      throw error;
-    }
+  const register = async () => {
+    return user;
   };
 
   const logout = async () => {
-    authPendingRef.current = true;
-    setIsAuthPending(true);
-    try {
-      setAuthError(null);
-      await signOut(auth);
-    } catch (error) {
-      authPendingRef.current = false;
-      setIsAuthPending(false);
-      setAuthError(error.message);
-      throw error;
-    }
+    window.localStorage.removeItem(STORAGE_KEY);
+    const guestUser = createGuestUser();
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(guestUser));
+    setUser(guestUser);
+    return guestUser;
   };
 
   return (
