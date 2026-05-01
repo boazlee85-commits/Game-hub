@@ -10,10 +10,11 @@
     "lint:fix": "eslint . --fix",
     "typecheck": "tsc -p ./jsconfig.json",
     "preview": "vite preview",
-    "ws-server": "node server/realtime-server.js"
+    "deploy": "npm run build && npx firebase deploy"
   },
   "dependencies": {
     "ws": "^8.19.0",
+    "firebase": "^10.11.0",
     "@hello-pangea/dnd": "^17.0.0",
     "@hookform/resolvers": "^4.1.2",
     "@radix-ui/react-accordion": "^1.2.3",

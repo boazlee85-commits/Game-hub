@@ -39,6 +39,18 @@ npm run build
 npm run preview
 ```
 
+**Firebase Hosting**
+
+1. Install Firebase CLI if needed: `npm install -g firebase-tools` or use `npx firebase`.
+2. Log in to Firebase: `firebase login`.
+3. Deploy the app:
+
+```bash
+npm run deploy
+```
+
+The project is already configured for Firebase Hosting and Firestore with the app settings provided.
+
 **Tech Stack**
 
 - React 18

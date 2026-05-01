@@ -1,60 +1,81 @@
-// Simple local storage service for games and ideas
-const GAMES_STORAGE_KEY = 'gamehub_games';
+import { db } from '@/lib/firebase';
+import {
+  collection,
+  doc,
+  getDocs,
+  onSnapshot,
+  orderBy,
+  query,
+  setDoc,
+  deleteDoc,
+} from 'firebase/firestore';
+
+const GAMES_COLLECTION = 'games';
 const IDEAS_STORAGE_KEY = 'gamehub_ideas';
 
+const normalizeGame = (docSnap) => ({
+  id: docSnap.id,
+  ...docSnap.data(),
+});
+
 export const gameStorage = {
-  getGames: () => {
+  getGames: async (sortBy = '-created_date') => {
     try {
-      const games = localStorage.getItem(GAMES_STORAGE_KEY);
-      return games ? JSON.parse(games) : [];
+      const field = sortBy.replace('-', '');
+      const direction = sortBy.startsWith('-') ? 'desc' : 'asc';
+      const queryRef = query(
+        collection(db, GAMES_COLLECTION),
+        orderBy(field, direction)
+      );
+      const snapshot = await getDocs(queryRef);
+      return snapshot.docs.map(normalizeGame);
     } catch (error) {
-      console.error('Error loading games:', error);
+      console.error('Error loading games from Firestore:', error);
       return [];
     }
   },
 
-  saveGame: (game) => {
+  getGamesSorted: async (sortBy = '-created_date') => {
+    return gameStorage.getGames(sortBy);
+  },
+
+  subscribeGames: (callback, sortBy = '-created_date') => {
+    const field = sortBy.replace('-', '');
+    const direction = sortBy.startsWith('-') ? 'desc' : 'asc';
+    const queryRef = query(
+      collection(db, GAMES_COLLECTION),
+      orderBy(field, direction)
+    );
+    return onSnapshot(queryRef, (snapshot) => {
+      callback(snapshot.docs.map(normalizeGame));
+    });
+  },
+
+  saveGame: async (game) => {
     try {
-      const games = gameStorage.getGames();
+      const gamesCollection = collection(db, GAMES_COLLECTION);
+      const newDoc = doc(gamesCollection);
       const newGame = {
         ...game,
-        id: game.id || `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-        created_date: game.created_date || new Date().toISOString(),
-        uploaded_by: game.uploaded_by || 'Anonymous' // Since no auth
+        id: newDoc.id,
+        created_date: new Date().toISOString(),
+        uploaded_by: 'Anonymous',
       };
-
-      if (!games.some((item) => item.id === newGame.id)) {
-        games.push(newGame);
-        localStorage.setItem(GAMES_STORAGE_KEY, JSON.stringify(games));
-      }
-
+      await setDoc(newDoc, newGame);
       return newGame;
     } catch (error) {
-      console.error('Error saving game:', error);
+      console.error('Error saving game to Firestore:', error);
       throw error;
     }
   },
 
-  deleteGame: (id) => {
+  deleteGame: async (id) => {
     try {
-      const games = gameStorage.getGames();
-      const nextGames = games.filter(game => game.id !== id);
-      localStorage.setItem(GAMES_STORAGE_KEY, JSON.stringify(nextGames));
-      return nextGames;
+      await deleteDoc(doc(db, GAMES_COLLECTION, id));
     } catch (error) {
-      console.error('Error deleting game:', error);
+      console.error('Error deleting game from Firestore:', error);
       throw error;
     }
-  },
-
-  getGamesSorted: (sortBy = '-created_date') => {
-    const games = gameStorage.getGames();
-    return games.sort((a, b) => {
-      const aVal = a[sortBy.replace('-', '')];
-      const bVal = b[sortBy.replace('-', '')];
-      const multiplier = sortBy.startsWith('-') ? -1 : 1;
-      return multiplier * (aVal > bVal ? 1 : aVal < bVal ? -1 : 0);
-    });
   },
 
   getIdeas: () => {
@@ -75,7 +96,7 @@ export const gameStorage = {
         id: Date.now().toString(),
         created_date: new Date().toISOString(),
         likes: 0,
-        liked_by: []
+        liked_by: [],
       };
       ideas.push(newIdea);
       localStorage.setItem(IDEAS_STORAGE_KEY, JSON.stringify(ideas));
@@ -89,7 +110,7 @@ export const gameStorage = {
   updateIdea: (id, updates) => {
     try {
       const ideas = gameStorage.getIdeas();
-      const index = ideas.findIndex(idea => idea.id === id);
+      const index = ideas.findIndex((idea) => idea.id === id);
       if (index !== -1) {
         ideas[index] = { ...ideas[index], ...updates };
         localStorage.setItem(IDEAS_STORAGE_KEY, JSON.stringify(ideas));
@@ -110,5 +131,5 @@ export const gameStorage = {
       const multiplier = sortBy.startsWith('-') ? -1 : 1;
       return multiplier * (aVal > bVal ? 1 : aVal < bVal ? -1 : 0);
     });
-  }
+  },
 };
