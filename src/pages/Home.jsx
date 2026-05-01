@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { gameStorage } from '@/lib/gameStorage';
+import { realtime } from '@/lib/realtime';
 import GameCard from '../components/GameCard';
 import { Input } from '@/components/ui/input';
 import { Gamepad2, Search } from 'lucide-react';
@@ -11,8 +12,23 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    realtime.initRealtime();
     setGames(gameStorage.getGamesSorted('-created_date'));
     setIsLoading(false);
+
+    const unsubscribe = realtime.onGameAdded((game) => {
+      setGames((prevGames) => {
+        if (prevGames.some((item) => item.id === game.id)) {
+          return prevGames;
+        }
+
+        const nextGames = [game, ...prevGames];
+        return nextGames.sort((a, b) => (a.created_date < b.created_date ? 1 : -1));
+      });
+      gameStorage.saveGame(game);
+    });
+
+    return unsubscribe;
   }, []);
 
   const handleDelete = (game) => {

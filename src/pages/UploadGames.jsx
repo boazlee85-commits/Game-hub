@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { gameStorage } from '@/lib/gameStorage';
+import { realtime } from '@/lib/realtime';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { CheckCircle2, KeyRound, Link as LinkIcon, Lock, Upload } from 'lucide-react';
@@ -52,7 +53,8 @@ export default function UploadGames() {
     if (!title.trim() || !link.trim()) return;
 
     try {
-      gameStorage.saveGame({ title: title.trim(), link: link.trim() });
+      const newGame = gameStorage.saveGame({ title: title.trim(), link: link.trim() });
+      realtime.broadcastGame(newGame);
       setTitle('');
       setLink('');
       setSuccess(true);

@@ -18,12 +18,16 @@ export const gameStorage = {
       const games = gameStorage.getGames();
       const newGame = {
         ...game,
-        id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-        created_date: new Date().toISOString(),
-        uploaded_by: 'Anonymous' // Since no auth
+        id: game.id || `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+        created_date: game.created_date || new Date().toISOString(),
+        uploaded_by: game.uploaded_by || 'Anonymous' // Since no auth
       };
-      games.push(newGame);
-      localStorage.setItem(GAMES_STORAGE_KEY, JSON.stringify(games));
+
+      if (!games.some((item) => item.id === newGame.id)) {
+        games.push(newGame);
+        localStorage.setItem(GAMES_STORAGE_KEY, JSON.stringify(games));
+      }
+
       return newGame;
     } catch (error) {
       console.error('Error saving game:', error);
