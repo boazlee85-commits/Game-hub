@@ -1,23 +1,23 @@
 import { useEffect, useState } from "react";
 
-export default function Home() {
-  const [games, setGames] = useState([]);
+export default function NonGames() {
+  const [items, setItems] = useState([]);
 
   useEffect(() => {
     const stored = JSON.parse(localStorage.getItem("items") || "[]");
-    setGames(stored.filter(i => i.type === "game"));
+    setItems(stored.filter(i => i.type === "non-game"));
   }, []);
 
   return (
     <div className="p-4">
-      <h1 className="text-3xl font-bold mb-4">Games</h1>
+      <h1 className="text-3xl font-bold mb-4">Non‑Games</h1>
 
-      {games.length === 0 && (
-        <p className="text-muted-foreground">No games uploaded yet.</p>
+      {items.length === 0 && (
+        <p className="text-muted-foreground">No non‑games uploaded yet.</p>
       )}
 
       <div className="grid gap-4">
-        {games.map(item => (
+        {items.map(item => (
           <div key={item.id} className="p-4 border rounded-lg bg-card">
             <a
               href={item.url}
@@ -32,4 +32,3 @@ export default function Home() {
     </div>
   );
 }
-

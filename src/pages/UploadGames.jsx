@@ -12,6 +12,7 @@ const DEFAULT_PASSWORD = '0424';
 export default function UploadGames() {
   const [title, setTitle] = useState('');
   const [link, setLink] = useState('');
+  const [type, setType] = useState('game'); // ⭐ NEW
   const [success, setSuccess] = useState(false);
   const [unlocked, setUnlocked] = useState(false);
   const [passwordInput, setPasswordInput] = useState('');
@@ -52,15 +53,26 @@ export default function UploadGames() {
     if (!title.trim() || !link.trim()) return;
 
     try {
-      await gameStorage.saveGame({ title: title.trim(), link: link.trim() });
+      // ⭐ UPDATED: save type
+      await gameStorage.saveGame({
+        title: title.trim(),
+        link: link.trim(),
+        type, // ⭐ NEW
+      });
+
       setTitle('');
       setLink('');
+      setType('game'); // reset
       setSuccess(true);
-      toast({ title: 'Game uploaded' });
+
+      toast({
+        title: type === 'game' ? 'Game uploaded' : 'Non‑game uploaded', // ⭐ UPDATED
+      });
+
       window.setTimeout(() => setSuccess(false), 3000);
     } catch (error) {
       toast({
-        title: 'Failed to upload game',
+        title: 'Failed to upload',
         description: 'Please try again.',
         variant: 'destructive',
       });
@@ -211,6 +223,19 @@ export default function UploadGames() {
           </div>
         </div>
 
+        {/* ⭐ NEW DROPDOWN */}
+        <div className="space-y-2">
+          <label className="text-sm font-semibold text-foreground">Type</label>
+          <select
+            value={type}
+            onChange={(e) => setType(e.target.value)}
+            className="h-12 w-full rounded-xl border border-border bg-background px-3 text-foreground"
+          >
+            <option value="game">Game</option>
+            <option value="non-game">Non‑Game</option>
+          </select>
+        </div>
+
         <Button
           onClick={handleUpload}
           disabled={!title.trim() || !link.trim()}
@@ -229,7 +254,9 @@ export default function UploadGames() {
               className="flex items-center gap-2 text-sm text-primary"
             >
               <CheckCircle2 className="h-4 w-4" />
-              Game uploaded successfully. Check it on the Home page.
+              {type === 'game'
+                ? 'Game uploaded successfully. Check it on the Home page.'
+                : 'Non‑game uploaded successfully. Check it on the Non‑Games page.'}
             </motion.div>
           )}
         </AnimatePresence>
@@ -237,3 +264,4 @@ export default function UploadGames() {
     </div>
   );
 }
+
